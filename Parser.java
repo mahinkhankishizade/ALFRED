@@ -22,6 +22,7 @@ public class Parser {
     ArrayList<String> hints_down;
 
     String html;
+    String date;
     String textFile = "7MarchPuzzleCode";
 
     private String solutionAddress;
@@ -76,6 +77,12 @@ public class Parser {
         }
         return hints_across;
     }
+    public void setPuzzleDate( String date) {
+        this.date = date;
+    }
+    public String getPuzzleDate() {
+        return date;
+    }
 
     public char[] getLettersOfBlocks() { return lettersOfBlocks; }
 
@@ -87,6 +94,7 @@ public class Parser {
         getColors(entireFileText);
         getNumbers(entireFileText);
         getLetters(entireFileText);
+        getPuzzleDate( entireFileText);
     }
 
     // this method fetchs the html code from the website and writes it to the textfile
@@ -118,6 +126,11 @@ public class Parser {
             e.printStackTrace();
             return "";
         }
+    }
+    public void getPuzzleDate( String html) {
+        Document document = Jsoup.parse( html);
+        Elements elements = document.getElementsByClass("PuzzleDetails-date--1HNzj");
+        setPuzzleDate( elements.text());
     }
 
     public void getHints(String html) {
