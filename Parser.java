@@ -15,47 +15,43 @@ import java.util.Scanner;
 
 public class Parser {
 
-    // ArrayLists for across hints
+    // variables
     ArrayList<String> hints;
-
-    // ArrayList for colors of the blocks
-    int[] colorsOfBlocks; // 1 is white, 0 is black
-
-    // ArrayList for numebrs of the blocks
-    int[] numbersOfBlocks; // 1 is white, 0 is black
-
-
-    String html; //= fetch( "https://www.nytimes.com/crosswords/game/mini");
+    int[] colorsOfBlocks;
+    int[] numbersOfBlocks;
+    String html;
     String textFile = "7MarchPuzzleCode";
 
 
     public Parser() {
-        // initializing the ArrayLists
-        /*acrossHints = new ArrayList<>();
-        acrossHintsOnly = new ArrayList<>();
-        acrossHintsNums = new ArrayList<>();
-        downHints = new ArrayList<>();
-        downHintsOnly = new ArrayList<>();
-        downHintsNums = new ArrayList<>();*/
+        // initialization
         hints = new ArrayList<String>();
         colorsOfBlocks = new int[25];
         numbersOfBlocks = new int[25];
 
         html = fetch( "https://www.nytimes.com/crosswords/game/mini");
+
+        // convertToString(); // use for old puzzles
     }
 
+    // getters and setters
     public void setHTMLString( String html) {
         this.html = html;
     }
-
     public String getHTMLString() {
         return html;
     }
+    public int[] getNumbersOfBlocks() { return numbersOfBlocks; }
+    public int[] getColorsOfBlocks() { return colorsOfBlocks; }
+    public ArrayList<String> getAllHints() { return hints; }
 
     // for using old puzzles
     public void convertToString() throws FileNotFoundException {
         String entireFileText = new Scanner( new File( textFile + ".txt")).useDelimiter("\\A").next();
         setHTMLString( entireFileText);
+        getHints( entireFileText);
+        getColors( entireFileText);
+        getNumbers( entireFileText);
     }
 
 
@@ -79,9 +75,10 @@ public class Parser {
 
             getHints( htmlDocument);
             getColors( htmlDocument);
-
+            getNumbers( htmlDocument);
 
             return htmlDocument;
+
         } catch (IOException e) {
             e.printStackTrace();
             return "";
@@ -120,7 +117,6 @@ public class Parser {
             int indexStart = newHTML.indexOf("class=\"") + 7;
             int indexEnd = indexStart + 16;
             String color = newHTML.substring(indexStart, indexEnd);
-            System.out.println(color);
 
             if (color.equals("Cell-block--1oNa"))
                 colorsOfBlocks[i] = 1; //black
@@ -130,33 +126,30 @@ public class Parser {
             newHTML = newHTML.substring(indexEnd);
         }
         for( int i = 0; i < 25; i++)
-            System.out.println(colorsOfBlocks[i] + " ");
+            System.out.print(colorsOfBlocks[i] + " ");
+        System.out.println("end");
     }
 
     // i need to get numbers for blocks
-    public int[] extractNumbers( String html) {
+    public void getNumbers( String html) {
         int size = 25;
-        int[] numbers = new int[size];
 
-        Document document = Jsoup.parse( html);
+        String newHTML = cutHTML( html);
+        Document document = Jsoup.parse( newHTML);
         Elements elements = document.getElementsByTag("g");
 
         for( int i = 0; i < elements.size() && i < size; i++) {
             String text = elements.get(i).text();
-            System.out.println(text);
-            /*int l = text.length() - 1;
-            while( !text.isEmpty() && (Character.isLetter( text.charAt(i)))) {
-                text = text.substring(0 , 1);
-                l--;
-            }*/
             if( !text.isEmpty()) {
-                numbers[i] = Integer.parseInt( text);
+                numbersOfBlocks[i] = Integer.parseInt( text);
             }
             else
-                numbers[i] = 0;
+                numbersOfBlocks[i] = 0;
         }
-        return numbers;
+        for( int i = 0; i < 25; i++)
+            System.out.print(numbersOfBlocks[i] + " ");
     }
+
     // i need to get the blocked grid texts
     public void extractLetters( String html) throws IOException {
         ArrayList<String> letters = new ArrayList<>();
@@ -171,12 +164,5 @@ public class Parser {
 
             }
         }
-
-
     }
-
-
-
-
-
 }
