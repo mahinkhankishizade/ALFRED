@@ -18,6 +18,8 @@ public class Parser {
     int[] colorsOfBlocks;
     int[] numbersOfBlocks;
     char[] lettersOfBlocks;
+    ArrayList<String> hints_across;
+    ArrayList<String> hints_down;
 
     String html;
     String textFile = "7MarchPuzzleCode";
@@ -28,6 +30,8 @@ public class Parser {
     public Parser() throws FileNotFoundException {
         // initialization
         hints = new ArrayList<String>();
+        hints_across = new ArrayList<String>();
+        hints_down = new ArrayList<String>();
         colorsOfBlocks = new int[25];
         numbersOfBlocks = new int[25];
         lettersOfBlocks = new char[25];
@@ -53,6 +57,26 @@ public class Parser {
     public ArrayList<String> getAllHints() {
         return hints;
     }
+
+    public ArrayList<String> getAcrossHints() {
+        for( int i = 0; i < 5; i++) {
+            hints_across.add( hints.get(i));
+        }
+        for( int i = 0; i < 5; i++) {
+            System.out.println(hints_across.get(i));
+        }
+        return hints_across;
+    }
+    public ArrayList<String> getDownHints() {
+        for( int i = 5; i < 10; i++) {
+            hints_down.add( hints.get(i));
+        }
+        for( int i = 0; i < 5; i++) {
+            System.out.println(hints_down.get(i));
+        }
+        return hints_across;
+    }
+
     public char[] getLettersOfBlocks() { return lettersOfBlocks; }
 
     // for using old puzzles
