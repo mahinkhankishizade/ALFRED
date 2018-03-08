@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
@@ -178,6 +180,23 @@ public class Main extends Application{
                 gridPane.getChildren().add(numLabelList[i]);
             }
         }
+
+        row = -1; col = 0;
+        for(int i = 0; i < 25; i++){
+            if(col % 5 == 0){
+                col = 0;
+                row += 1;
+            }
+            GridPane.setConstraints(textList.get(i), col, row);
+            GridPane.setHalignment(textList.get(i), HPos.CENTER);
+            col += 1;
+        }
+
+        for( int i = 0; i < 25; i++) {
+            if( cellList.get(i).getFill() != Color.BLACK) {
+                gridPane.getChildren().add(textList.get(i));
+            }
+        }
     }
 
     public void fillCells() {
@@ -190,12 +209,16 @@ public class Main extends Application{
                 temp1.setStroke(Color.BLACK);
                 temp1.setStrokeWidth(1);
                 cellList.add(temp1);
+                TextField area = new TextField();
+                area.setMaxSize( CELLWIDTH/2, CELLHEIGHT/2);
+                textList.add(area);
             }
             // black cells
             else{
                 Rectangle temp2 = new Rectangle(CELLWIDTH, CELLHEIGHT);
                 temp2.setFill(Color.BLACK);
                 cellList.add(temp2);
+                textList.add(new TextField());
             }
             i += 1;
         }
