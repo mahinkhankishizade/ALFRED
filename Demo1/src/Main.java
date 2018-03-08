@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
@@ -85,7 +86,8 @@ public class Main extends Application{
             cluePane.getChildren().add(labelList.get(i));
         }
         // solution button
-        cluePane.getChildren().add(new Button("Show Solution"));
+        Button button = new Button("Show Solution");
+        cluePane.getChildren().add(button);
 
 
         GridPane gridPane = new GridPane();
@@ -131,6 +133,7 @@ public class Main extends Application{
             }
         }
 
+        button.setOnAction(e -> display(parser, gridPane));
 //        //gridPane.setAlignment(Pos.CENTER);
 //        for(Rectangle rect : cellList){
 //            gridPane.getChildren().add(rect);
@@ -151,4 +154,32 @@ public class Main extends Application{
         window.show();
 
     }
+
+    public static void display(Parser parser, GridPane gridPane){
+
+        Label[] chars = new Label[25];
+        int row = -1, col = 0;
+        for(int i = 0; i < 25; i++){
+            if(col % 5 == 0){
+                col = 0;
+                row += 1;
+            }
+            if(parser.getLettersOfBlocks()[i] != ' ') {
+                chars[i] = new Label("         " + String.valueOf(parser.getLettersOfBlocks()[i]));
+                chars[i].setFont(new Font(20));
+                GridPane.setConstraints(chars[i], col, row);
+            }
+            else{
+                chars[i] = null;
+            }
+            col += 1;
+        }
+
+        for(int i = 0; i < 25; i++){
+            if(chars[i] != null){
+                gridPane.getChildren().add(chars[i]);
+            }
+        }
+    }
 }
+
