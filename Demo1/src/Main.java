@@ -4,33 +4,47 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Main extends Application{
 
-    final int CELLWIDTH = 100;
+    final int CELLWIDTH = 50;
     final int CELLHEIGHT = 50;
     Stage window;
     Scene scene1, scene2;
     Button button1;
-    Label label1;
+    Label date;
     BorderPane border;
     ArrayList<String> clueList;
     ArrayList<Label> labelList;
     ArrayList<Rectangle> cellList;
+    ArrayList<TextField> textList;
     Label[] numLabelList;
     int[] blockColors;
     Parser parser;
+    Button solution;
+    Label across, down;
+    GridPane gridPane;
+    VBox cluePane;
+    HBox crossword, label_and_button;
+    SolutionBox box;
 
     public static void main(String[] args) throws IOException {
         launch(args);
@@ -39,80 +53,112 @@ public class Main extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception {
         parser = new Parser();
+        box = new SolutionBox();
+
+        StackPane layout = new StackPane();
+
+        // add background image
+        Image image = new Image(Paths.get("C:/Users/User/Desktop/School/cs461/Project/background.jpg").toUri().toString(), true);
+        layout.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+
+        // initialize
         clueList = new ArrayList<>();
         clueList = parser.getAllHints();
         window = primaryStage;
         labelList = new ArrayList<>();
         cellList = new ArrayList<>();
+        textList = new ArrayList<>();
         blockColors = parser.getColorsOfBlocks();
         numLabelList = new Label[25];
+        border = new BorderPane();
 
         for(int i = 0; i < 10; i++){
             labelList.add( new Label( clueList.get(i) ));
         }
 
-        label1 = new Label("New York Times Mini-Crossword Puzzle");
-        label1.setTextAlignment(TextAlignment.CENTER);
-
+        // style labels
+        styleLabels();
         // Create Cells
-        int i = 0;
-        for (int value : blockColors) {
-            // white cells
-            if(value == 0){
-                Rectangle temp1 = new Rectangle(CELLWIDTH, CELLHEIGHT);
-                temp1.setFill(Color.TRANSPARENT);
-                temp1.setStroke(Color.BLACK);
-                temp1.setStrokeWidth(1);
-                cellList.add(temp1);
-            }
-            // black cells
-            else{
-                Rectangle temp2 = new Rectangle(CELLWIDTH, CELLHEIGHT);
-                temp2.setFill(Color.BLACK);
-                cellList.add(temp2);
-            }
-            i += 1;
-        }
+        fillCells();
+        // adding clues to VBox
+        addToVbox();
+        // creating grid and adding cells
+        createGridPane();
+        // create HBoxes
+        createHBoxes();
+       // createTextFields();
 
-        border = new BorderPane();
+        // add to borderpane
+        border.setTop(label_and_button);
+        border.setCenter(crossword);
+        border.setPadding(new Insets(40, 50, 10, 50));
 
-        // setup clues
-        VBox cluePane = new VBox(10);
-        cluePane.setAlignment(Pos.TOP_LEFT);
-        cluePane.getChildren().add(new Label("Across"));
-        for( i = 0; i < 10; i++){
-            if(i == 5)
-                cluePane.getChildren().add(new Label("Down"));
-            cluePane.getChildren().add(labelList.get(i));
-        }
+        layout.getChildren().add(border);
+
+        // add style
+        String style = this.getClass().getResource("style.css").toExternalForm();
+        scene1 = new Scene(layout, 710, 450);
+        scene1.getStylesheets().add(style);
+
+        window.setScene(scene1);
+        window.setTitle("NYT Crossword");
+        window.show();
+    }
+
+    public void showSolution() throws FileNotFoundException {
+        SolutionBox box = new SolutionBox();
+        box.display();
+    }
+
+    public void styleLabels() {
+        // date label
+        date = new Label(parser.getPuzzleDate());
+        date.setId("date-text");
+        date.setTextAlignment(TextAlignment.CENTER);
+        date.setPadding(new Insets(20, 300, 30, 10));
+
         // solution button
-        Button button = new Button("Show Solution");
-        cluePane.getChildren().add(button);
+        solution = new Button("Show Solution");
+        solution.setId("green");
+        solution.setOnAction(e -> {
+            try {
+                showSolution();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        });
 
+        // across and down labels
+        across = new Label("Across");
+        across.setId("across_and_down");
+        down = new Label("Down");
+        down.setId("across_and_down");
+    }
 
-        GridPane gridPane = new GridPane();
+    public void createGridPane() {
+        gridPane = new GridPane();
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setVgap(0);
         gridPane.setHgap(0);
 
-
         int row = -1, col = 0;
-        for(i = 0; i < 25; i++){
+        for(int i = 0; i < 25; i++){
             if(col % 5 == 0){
                 col = 0;
                 row += 1;
             }
             GridPane.setConstraints(cellList.get(i), col, row);
+            //GridPane.setConstraints(textList.get(i), col, row);
             col += 1;
         }
 
-        for(Rectangle rect : cellList){
+        for(Rectangle rect : cellList) {
             gridPane.getChildren().add(rect);
         }
 
         // making number labels for blocks
         row = -1; col = 0;
-        for(i = 0; i < 25; i++){
+        for(int i = 0; i < 25; i++){
             if(col % 5 == 0){
                 col = 0;
                 row += 1;
@@ -127,59 +173,64 @@ public class Main extends Application{
             col += 1;
         }
 
-        for(i = 0; i < 25; i++){
+        for(int i = 0; i < 25; i++){
             if(numLabelList[i] != null){
                 gridPane.getChildren().add(numLabelList[i]);
             }
         }
-
-        button.setOnAction(e -> display(parser, gridPane));
-//        //gridPane.setAlignment(Pos.CENTER);
-//        for(Rectangle rect : cellList){
-//            gridPane.getChildren().add(rect);
-//        }
-        //gridPane.getChildren().addAll(label1, rect1);
-
-
-        border.setTop(label1);
-
-        //border.
-        border.setLeft(gridPane);
-        border.setRight(cluePane);
-
-        scene1 = new Scene(border,800, 500);
-
-        window.setScene(scene1);
-        window.setTitle("FX");
-        window.show();
-
     }
 
-    public static void display(Parser parser, GridPane gridPane){
-
-        Label[] chars = new Label[25];
-        int row = -1, col = 0;
-        for(int i = 0; i < 25; i++){
-            if(col % 5 == 0){
-                col = 0;
-                row += 1;
+    public void fillCells() {
+        int i = 0;
+        for (int value : blockColors) {
+            // white cells
+            if(value == 0){
+                Rectangle temp1 = new Rectangle(CELLWIDTH, CELLHEIGHT);
+                temp1.setFill(Color.WHITE);
+                temp1.setStroke(Color.BLACK);
+                temp1.setStrokeWidth(1);
+                cellList.add(temp1);
             }
-            if(parser.getLettersOfBlocks()[i] != ' ') {
-                chars[i] = new Label("         " + String.valueOf(parser.getLettersOfBlocks()[i]));
-                chars[i].setFont(new Font(20));
-                GridPane.setConstraints(chars[i], col, row);
-            }
+            // black cells
             else{
-                chars[i] = null;
+                Rectangle temp2 = new Rectangle(CELLWIDTH, CELLHEIGHT);
+                temp2.setFill(Color.BLACK);
+                cellList.add(temp2);
             }
-            col += 1;
+            i += 1;
         }
+    }
 
-        for(int i = 0; i < 25; i++){
-            if(chars[i] != null){
-                gridPane.getChildren().add(chars[i]);
+    public void createTextFields() {
+        for( int value: blockColors) {
+            if( value == 0) {
+                TextField area = new TextField();
+                textList.add(area);
             }
         }
+        for( int i = 0; i < 25; i++) {
+            gridPane.getChildren().add(textList.get(i));
+        }
+    }
+
+    public void addToVbox() {
+        cluePane = new VBox(10);
+        cluePane.getChildren().add(across);
+
+        for( int i = 0; i < 10; i++){
+            if(i == 5)
+                cluePane.getChildren().add(down);
+            cluePane.getChildren().add(labelList.get(i));
+        }
+    }
+
+    public void createHBoxes() {
+        crossword = new HBox();
+        crossword.getChildren().addAll(gridPane, cluePane);
+        crossword.setSpacing( 100);
+
+        label_and_button = new HBox();
+        label_and_button.getChildren().addAll( date, solution);
+        label_and_button.setSpacing( 25);
     }
 }
-
