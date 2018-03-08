@@ -84,6 +84,8 @@ public class Main extends Application{
                 cluePane.getChildren().add(new Label("Down"));
             cluePane.getChildren().add(labelList.get(i));
         }
+        // solution button
+        cluePane.getChildren().add(new Button("Show Solution"));
 
 
         GridPane gridPane = new GridPane();
