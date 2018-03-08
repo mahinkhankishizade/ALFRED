@@ -32,13 +32,6 @@ public class Main extends Application{
     Parser parser;
 
     public static void main(String[] args) throws IOException {
-//        ArrayList<String> list = new ArrayList<String>();
-//        Parser parser = new Parser();
-        //list = parser.findClues();
-        //parser.getBlackBlockCoordinates();
-       /*for(int i = 0; i < 10; i++ ) {
-           System.out.println(list.get(i));
-       }*/
         launch(args);
     }
 
@@ -60,21 +53,11 @@ public class Main extends Application{
         label1 = new Label("New York Times Mini-Crossword Puzzle");
         label1.setTextAlignment(TextAlignment.CENTER);
 
-        Rectangle rect1 = new Rectangle(10, 10, 500, 500);
-        rect1.setFill(Color.FLORALWHITE);
-
         // Create Cells
-        int xpos = 0;
-        int ypos = -CELLHEIGHT;
         int i = 0;
         for (int value : blockColors) {
             // white cells
-            if(i % 5 == 0){
-                xpos = 0;
-                ypos += CELLHEIGHT;
-            }
             if(value == 0){
-                //cellList.add(new Rectangle(xpos, ypos, CELLWIDTH, CELLHEIGHT));
                 Rectangle temp1 = new Rectangle(CELLWIDTH, CELLHEIGHT);
                 temp1.setFill(Color.TRANSPARENT);
                 temp1.setStroke(Color.BLACK);
@@ -83,20 +66,22 @@ public class Main extends Application{
             }
             // black cells
             else{
-                //Rectangle temp = new Rectangle(xpos, ypos, CELLWIDTH, CELLHEIGHT);
                 Rectangle temp2 = new Rectangle(CELLWIDTH, CELLHEIGHT);
                 temp2.setFill(Color.BLACK);
                 cellList.add(temp2);
             }
             i += 1;
-            xpos += CELLWIDTH;
         }
 
         border = new BorderPane();
 
+        // setup clues
         VBox cluePane = new VBox(10);
-        cluePane.setAlignment(Pos.CENTER_LEFT);
+        cluePane.setAlignment(Pos.TOP_LEFT);
+        cluePane.getChildren().add(new Label("Across"));
         for( i = 0; i < 10; i++){
+            if(i == 5)
+                cluePane.getChildren().add(new Label("Down"));
             cluePane.getChildren().add(labelList.get(i));
         }
 
@@ -157,7 +142,7 @@ public class Main extends Application{
         border.setLeft(gridPane);
         border.setRight(cluePane);
 
-        scene1 = new Scene(border,1200, 700);
+        scene1 = new Scene(border,800, 500);
 
         window.setScene(scene1);
         window.setTitle("FX");
