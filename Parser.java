@@ -46,15 +46,19 @@ public class Parser {
     public void setHTMLString(String html) {
         this.html = html;
     }
+
     public String getHTMLString() {
         return html;
     }
+
     public int[] getNumbersOfBlocks() {
         return numbersOfBlocks;
     }
+
     public int[] getColorsOfBlocks() {
         return colorsOfBlocks;
     }
+
     public ArrayList<String> getAllHints() {
         return hints;
     }
@@ -68,6 +72,7 @@ public class Parser {
         }
         return hints_across;
     }
+
     public ArrayList<String> getDownHints() {
         for( int i = 5; i < 10; i++) {
             hints_down.add( hints.get(i));
@@ -77,9 +82,11 @@ public class Parser {
         }
         return hints_across;
     }
+
     public void setPuzzleDate( String date) {
         this.date = date;
     }
+
     public String getPuzzleDate() {
         return date;
     }
@@ -127,6 +134,7 @@ public class Parser {
             return "";
         }
     }
+
     public void getPuzzleDate( String html) {
         Document document = Jsoup.parse( html);
         Elements elements = document.getElementsByClass("PuzzleDetails-date--1HNzj");
